@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+    
+    <entry>
+      <title><![CDATA[新一代Java模板引擎Thymeleaf]]></title>
+      <url>/2017/09/18/%E6%96%B0%E4%B8%80%E4%BB%A3Java%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8EThymeleaf/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>Thymeleaf是一款用于渲染XML/XHTML/HTML5内容的模板引擎。类似JSP，Velocity，FreeMaker等，它也可以轻易的与Spring MVC等Web框架进行集成作为Web应用的模板引擎。与其它模板引擎相比，Thymeleaf最大的特点是能够直接在浏览器中打开并正确显示模板页面，而不需要启动整个Web应用。</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="Thymeleaf-标准模板"><a href="#Thymeleaf-标准模板" class="headerlink" title="Thymeleaf 标准模板"></a>Thymeleaf 标准模板</h4><hr>
+<p><code>thymeleaf 最大的特点是通过HTML的标签属性渲染标签内容</code>，<code>thymeleaf</code>标准模板例子:</p>
+<pre><code>&lt;!DOCTYPE html SYSTEM &quot;http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd&quot;&gt;
+
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;
+      xmlns:th=&quot;http://www.thymeleaf.org&quot;&gt;
+
+  &lt;head&gt;
+    &lt;title&gt;Good Thymes Virtual Grocery&lt;/title&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot; /&gt;
+    &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; media=&quot;all&quot; 
+          href=&quot;../../css/gtvg.css&quot; th:href=&quot;@{/css/gtvg.css}&quot; /&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+
+    &lt;p th:text=&quot;#{home.welcome}&quot;&gt;Welcome to our grocery store!&lt;/p&gt;
+
+  &lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre><p>这是一段标准的HTML代码，这也就意味着通过浏览器直接打开它是可以正确解析它的结构并看到页面的样子。相比去其他的模板引擎在指定的位置通过<code>${}</code>等表达式进行渲染，Thymeleaf则是一种针对HTML/XML定制的模板语言（当然它可以被扩展），它通过标签中的<code>th:text</code>属性来填充该标签的一段内容。上例中，<code>&lt;p th:text=&quot;#{home.welcome}&quot;&gt;Welcome to our grocery store!&lt;/p&gt;</code>意味着<code>&lt;p&gt;</code>标签中的内容会被表达式<code>#{home.welcome}</code>的值所替代，无论模板中它的内容是什么，之所以在模板中“多此一举“地填充它的内容，完全是为了它能够作为原型在浏览器中直接显示出来。</p>
+<h4 id="标准表达式语法"><a href="#标准表达式语法" class="headerlink" title="标准表达式语法"></a>标准表达式语法</h4><hr>
+<h5 id="变量"><a href="#变量" class="headerlink" title="变量"></a><strong>变量</strong></h5><p>Thymeleaf模板引擎在进行模板渲染时，还会附带一个Context存放进行模板渲染的变量，在模板中定义的表达式本质上就是从Context中获取对应的变量的值：</p>
+<pre><code class="html">&lt;p&gt;Today is: &lt;span th:text=&quot;${today}&quot;&gt;13 february 2011&lt;/span&gt;.&lt;/p&gt;
+</code></pre>
+<p>假设today的值为2015年8月14日，那么渲染结果为：<code>&lt;p&gt;Today is: 2015年8月14日.&lt;/p&gt;</code>。可见Thymeleaf的基本变量和JSP一样，都使用<code>${.}</code>表示获取变量的值</p>
+<h5 id="URL"><a href="#URL" class="headerlink" title="URL"></a><strong>URL</strong></h5><p>URL在Web应用模板中占据着十分重要的地位，<strong>需要特别注意的是</strong>Thymeleaf对于URL的处理是通过语法<code>@{...}</code>来处理的。Thymeleaf支持绝对路径URL：</p>
+<pre><code class="html">&lt;a th:href=&quot;@{http://www.thymeleaf.org}&quot;&gt;Thymeleaf&lt;/a&gt;
+</code></pre>
+<p>同时也能够支持相对路径URL：</p>
+<ul>
+<li>当前页面相对路径URL——<code>user/login.html</code>，通常不推荐这样写。</li>
+<li>Context相关URL——<code>/static/css/style.css</code></li>
+</ul>
+<p>另外，如果需要Thymeleaf对URL进行渲染，那么务必使用<code>th:href，th:src</code>等属性，下面是一个例子</p>
+<pre><code class="html">&lt;!-- Will produce &#39;http://localhost:8080/gtvg/order/details?orderId=3&#39; (plus rewriting) --&gt;
+&lt;a href=&quot;details.html&quot; 
+   th:href=&quot;@{http://localhost:8080/gtvg/order/details(orderId=${o.id})}&quot;&gt;view&lt;/a&gt;
+
+&lt;!-- Will produce &#39;/gtvg/order/details?orderId=3&#39; (plus rewriting) --&gt;
+&lt;a href=&quot;details.html&quot; th:href=&quot;@{/order/details(orderId=${o.id})}&quot;&gt;view&lt;/a&gt;
+
+&lt;!-- Will produce &#39;/gtvg/order/3/details&#39; (plus rewriting) --&gt;
+&lt;a href=&quot;details.html&quot; th:href=&quot;@{/order/{orderId}/details(orderId=${o.id})}&quot;&gt;view&lt;/a&gt;
+</code></pre>
+<p>几点说明：</p>
+<ul>
+<li>上例中URL最后的(orderId=${o.id})表示将括号内的内容作为URL参数处理，该语法避免使用字符串拼接，大大提高了可读性</li>
+<li><code>@{...}</code>表达式中可以通过<code>{orderId}</code>访问Context中的<code>orderId</code>变量</li>
+<li><code>@{/order}</code>是Context相关的相对路径，在渲染时会自动添加上当前Web应用的Context名字，假设context名字为app，那么结果应该是<code>/app/order</code></li>
+</ul>
+<h5 id="字符串替换"><a href="#字符串替换" class="headerlink" title="字符串替换"></a><strong>字符串替换</strong></h5><p>很多时候可能我们只需要对一大段文字中的某一处地方进行替换，可以通过字符串拼接操作完成：</p>
+<pre><code class="html">&lt;span th:text=&quot;&#39;Welcome to our application, &#39; + ${user.name} + &#39;!&#39;&quot;&gt;
+</code></pre>
+<p>一种更简洁的方式是：</p>
+<pre><code>&lt;span th:text=&quot;|Welcome to our application, ${user.name}!|&quot;&gt;
+</code></pre><p>当然这种形式限制比较多，<code>|...|</code>中只能包含变量表达式<code>${...}</code>，不能包含其他常量、条件表达式等。</p>
+<h5 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a><strong>运算符</strong></h5><hr>
+<p>在表达式中可以使用各类算术运算符，例如+, -, *, /, %</p>
+<pre><code class="html">th:with=&quot;isEven=(${prodStat.count} % 2 == 0)&quot;
+</code></pre>
+<p>逻辑运算符<code>&gt;, &lt;, &lt;=,&gt;=，==,!=</code>都可以使用，唯一需要注意的是使用<code>&lt;</code>,<code>&gt;</code>时需要用它的HTML转义符：</p>
+<pre><code class="html">th:if=&quot;${prodStat.count} &amp;gt; 1&quot;
+th:text=&quot;&#39;Execution mode is &#39; + ( (${execMode} == &#39;dev&#39;)? &#39;Development&#39; : &#39;Production&#39;)&quot;
+</code></pre>
+<h5 id="循环"><a href="#循环" class="headerlink" title="循环"></a><strong>循环</strong></h5><hr>
+<p>渲染列表数据是一种非常常见的场景，例如现在有n条记录需要渲染成一个表格<code>&lt;table&gt;</code>，该数据集合必须是可以遍历的，使用<code>th:each</code>标签：</p>
+<pre><code class="html">&lt;body&gt;
+  &lt;h1&gt;Product list&lt;/h1&gt;
+
+  &lt;table&gt;
+    &lt;tr&gt;
+      &lt;th&gt;NAME&lt;/th&gt;
+      &lt;th&gt;PRICE&lt;/th&gt;
+      &lt;th&gt;IN STOCK&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr th:each=&quot;prod : ${prods}&quot;&gt;
+      &lt;td th:text=&quot;${prod.name}&quot;&gt;Onions&lt;/td&gt;
+      &lt;td th:text=&quot;${prod.price}&quot;&gt;2.41&lt;/td&gt;
+      &lt;td th:text=&quot;${prod.inStock}? #{true} : #{false}&quot;&gt;yes&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/table&gt;
+
+  &lt;p&gt;
+    &lt;a href=&quot;../home.html&quot; th:href=&quot;@{/}&quot;&gt;Return to home&lt;/a&gt;
+  &lt;/p&gt;
+&lt;/body&gt;
+</code></pre>
+<p>可以看到，需要在被循环渲染的元素（这里是<code>&lt;tr&gt;</code>）中加入<code>th:each</code>标签，其中<code>th:each=&quot;prod : ${prods}&quot;</code>意味着对集合变量<code>prods</code>进行遍历，循环变量是<code>prod</code>在循环体中可以通过表达式访问。</p>
+<h5 id="条件求值"><a href="#条件求值" class="headerlink" title="条件求值"></a><strong>条件求值</strong></h5><hr>
+<p><strong>If/Unless</strong><br>Thymeleaf中使用<code>th:if</code>和<code>th:unless</code>属性进行条件判断，下面的例子中，<code>&lt;a&gt;</code>标签只有在<code>th:if</code>中条件成立时才显示：</p>
+<pre><code class="html">&lt;a th:href=&quot;@{/login}&quot; th:unless=${session.user != null}&gt;Login&lt;/a&gt;
+</code></pre>
+<p><code>th:unless</code>于<code>th:if</code>恰好相反，只有表达式中的条件不成立，才会显示其内容。</p>
+<p><strong>Switch</strong><br>Thymeleaf同样支持多路选择Switch结构：</p>
+<pre><code class="html">&lt;div th:switch=&quot;${user.role}&quot;&gt;
+  &lt;p th:case=&quot;&#39;admin&#39;&quot;&gt;User is an administrator&lt;/p&gt;
+  &lt;p th:case=&quot;#{roles.manager}&quot;&gt;User is a manager&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+<p>默认属性default可以用<code>*</code>表示：</p>
+<pre><code class="html">&lt;div th:switch=&quot;${user.role}&quot;&gt;
+  &lt;p th:case=&quot;&#39;admin&#39;&quot;&gt;User is an administrator&lt;/p&gt;
+  &lt;p th:case=&quot;#{roles.manager}&quot;&gt;User is a manager&lt;/p&gt;
+  &lt;p th:case=&quot;*&quot;&gt;User is some other thing&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+<p><strong>Utilities</strong></p>
+<ul>
+<li><code>#dates</code></li>
+<li><code>#calendars</code></li>
+<li><code>#numbers</code></li>
+<li><code>#strings</code></li>
+<li><code>arrays</code></li>
+<li><code>lists</code></li>
+<li><code>sets</code></li>
+<li><code>maps</code></li>
+<li><code>...</code></li>
+</ul>
+<p>下面用一段代码来举例一些常用的方法：</p>
+<p><code>#dates</code></p>
+<pre><code>/*
+ * Format date with the specified pattern
+ * Also works with arrays, lists or sets
+ */
+${#dates.format(date, &#39;dd/MMM/yyyy HH:mm&#39;)}
+${#dates.arrayFormat(datesArray, &#39;dd/MMM/yyyy HH:mm&#39;)}
+${#dates.listFormat(datesList, &#39;dd/MMM/yyyy HH:mm&#39;)}
+${#dates.setFormat(datesSet, &#39;dd/MMM/yyyy HH:mm&#39;)}
+
+/*
+ * Create a date (java.util.Date) object for the current date and time
+ */
+${#dates.createNow()}
+
+/*
+ * Create a date (java.util.Date) object for the current date (time set to 00:00)
+ */
+${#dates.createToday()}
+</code></pre><p><code>#strings</code></p>
+<pre><code>/*
+ * Check whether a String is empty (or null). Performs a trim() operation before check
+ * Also works with arrays, lists or sets
+ */
+${#strings.isEmpty(name)}
+${#strings.arrayIsEmpty(nameArr)}
+${#strings.listIsEmpty(nameList)}
+${#strings.setIsEmpty(nameSet)}
+
+/*
+ * Check whether a String starts or ends with a fragment
+ * Also works with arrays, lists or sets
+ */
+${#strings.startsWith(name,&#39;Don&#39;)}                  // also array*, list* and set*
+${#strings.endsWith(name,endingFragment)}           // also array*, list* and set*
+
+/*
+ * Compute length
+ * Also works with arrays, lists or sets
+ */
+${#strings.length(str)}
+
+/*
+ * Null-safe comparison and concatenation
+ */
+${#strings.equals(str)}
+${#strings.equalsIgnoreCase(str)}
+${#strings.concat(str)}
+${#strings.concatReplaceNulls(str)}
+
+/*
+ * Random
+ */
+${#strings.randomAlphanumeric(count)}
+</code></pre><h4 id="页面即原型"><a href="#页面即原型" class="headerlink" title="页面即原型"></a>页面即原型</h4><p>在Web开发过程中一个绕不开的话题就是前端工程师与后端工程师的协作，在传统Java Web开发过程中，前端工程师和后端工程师一样，也需要安装一套完整的开发环境，然后各类Java IDE中修改模板、静态资源文件，启动/重启/重新加载应用服务器，刷新页面查看最终效果。</p>
+<p>但实际上前端工程师的职责更多应该关注于页面本身而非后端，使用JSP，Velocity等传统的Java模板引擎很难做到这一点，因为它们必须在应用服务器中渲染完成后才能在浏览器中看到结果，而Thymeleaf从根本上颠覆了这一过程，通过属性进行模板渲染不会引入任何新的浏览器不能识别的标签，例如JSP中的<code>&lt;form:input&gt;</code>，不会在Tag内部写表达式。整个页面直接作为HTML文件用浏览器打开，几乎就可以看到最终的效果，这大大解放了前端工程师的生产力，它们的最终交付物就是纯的HTML/CSS/JavaScript文件</p>
+]]></content>
+      
+        <categories>
+            
+            <category> Thymeleaf </category>
+            
+        </categories>
+        
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Hello World]]></title>
+      <url>/2017/09/16/hello-world/</url>
+      <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<a id="more"></a>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre><code class="bash">$ hexo new &quot;My New Post&quot;
+</code></pre>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre><code class="bash">$ hexo server
+</code></pre>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre><code class="bash">$ hexo generate
+</code></pre>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre><code class="bash">$ hexo deploy
+</code></pre>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> test </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> hexo </tag>
+            
+            <tag> test </tag>
+            
+            <tag> Hello World </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[一些springboot小技巧、小知识点]]></title>
+      <url>/2017/09/15/%E4%B8%80%E4%BA%9Bspringboot%E5%B0%8F%E6%8A%80%E5%B7%A7%E3%80%81%E5%B0%8F%E7%9F%A5%E8%AF%86%E7%82%B9/</url>
+      <content type="html"><![CDATA[<p>一些springboot小技巧、小知识点</p>
+<p>初始化数据</p>
+<p>我们在做测试的时候经常需要初始化导入一些数据，如何来处理呢？会有两种选择，一种是使用Jpa，另外一种是Spring JDBC。两种方式各有区别下面来详细介绍。</p>
+<a id="more"></a>
+<p>使用Jpa</p>
+<p>在使用spring boot jpa的情况下设置spring.jpa.hibernate.ddl-auto的属性设置为 create or create-drop的时候，spring boot 启动时默认会扫描classpath下面（项目中一般是resources目录）是否有import.sql，如果有机会执行import.sql脚本。</p>
+<p>使用Spring JDBC</p>
+<p>使用Spring JDBC 需要在配置文件中添加以下配置</p>
+<p>spring:<br>    datasource:<br>      schema: database/data.sql<br>      sql-script-encoding: utf-8<br>    jpa:<br>      hibernate:<br>        ddl-auto: none<br>schema ：设置脚本的路径<br>sql-script-encoding：设置脚本的编码<br>spring boot项目启动的时候会自动执行脚本。</p>
+<p>ddl-auto 四个值的解释</p>
+<p>create： 每次加载hibernate时都会删除上一次的生成的表，然后根据你的model类再重新来生成新表，哪怕两次没有任何改变也要这样执行，这就是导致数据库表数据丢失的一个重要原因。<br>create-drop ：每次加载hibernate时根据model类生成表，但是sessionFactory一关闭,表就自动删除。<br>update：最常用的属性，第一次加载hibernate时根据model类会自动建立起表的结构（前提是先建立好数据库），以后加载hibernate时根据 model类自动更新表结构，即使表结构改变了但表中的行仍然存在不会删除以前的行。要注意的是当部署到服务器后，表结构是不会被马上建立起来的，是要等 应用第一次运行起来后才会。<br>validate ：每次加载hibernate时，验证创建数据库表结构，只会和数据库中的表进行比较，不会创建新表，但是会插入新值。 5、 none : 什么都不做。<br>不同点</p>
+<p>第一种方式启动的时候Jpa会自动创建表，import.sql只负责创建表单后的初始化数据。第二种方式启动的时候不会创建表，需要在初始化脚本中判断表是否存在，再初始化脚本的步骤。</p>
+<p>在生产中，这两种模式都建议慎用！<br>参考：howto-database-initialization</p>
+<p>thymeleaf 设置不校验html标签</p>
+<p>默认配置下，thymeleaf对.html的内容要求很严格，比如，如果少封闭符号/，就会报错而转到错误页。也比如你在使用Vue.js这样的库，然后有</p>
+<p>这样的html代码，也会被thymeleaf认为不符合要求而抛出错误。<br>通过设置thymeleaf模板可以解决这个问题，下面是具体的配置:</p>
+<p>spring.thymeleaf.cache=false<br>spring.thymeleaf.mode=LEGACYHTML5<br>LEGACYHTML5需要搭配一个额外的库NekoHTML才可用 项目中使用的构建工具是Maven添加如下的依赖即可完成:</p>
+<p><dependency><br>    <groupid>net.sourceforge.nekohtml</groupid><br>    <artifactid>nekohtml</artifactid><br>    <version>1.9.22</version><br></dependency><br>参考：thymeleaf模板对没有结束符的HTML5标签解析出错的解决办法</p>
+<p>随机端口</p>
+<p>为Spring Cloud的应用实用随机端口非常简单，主要有两种方法：</p>
+<p>设置server.port=0，当应用启动的时候会自动的分配一个随机端口，但是该方式在注册到Eureka的时候会一个问题：所有实例都使用了同样的实例名（如：Lenovo-test:hello-service:0），这导致只出现了一个实例。所以，我们还需要修改实例ID的定义，让每个实例的ID不同，比如使用随机数来配置实例ID：</p>
+<p>server.port=0<br>eureka.instance.instance-id=${spring.application.name}:${random.int}<br>除了上面的方法，实际上我们还可以直接使用random函数来配置server.port。这样就可以指定端口的取值范围，比如：</p>
+<p>server.port=${random.int[10000,19999]}<br>由于默认的实例ID会由server.port拼接，而此时server.port设置的随机值会重新取一次随机数，所以使用这种方法的时候不需要重新定义实例ID的规则就能产生不同的实例ID了。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> SpringBoot </category>
+            
+        </categories>
+        
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[我的第一篇博客]]></title>
+      <url>/2017/09/13/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/</url>
+      <content type="html"><![CDATA[<p>我的第一篇博客，写点什么呢？Hello World !</p>
+]]></content>
+      
+        <categories>
+            
+            <category> blog </category>
+            
+        </categories>
+        
+        
+    </entry>
+    
+  
+  
+</search>
