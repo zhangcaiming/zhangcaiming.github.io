@@ -2202,3 +2202,7 @@ a.gitment-editor-footer-tip:hover {
 .hvr-grow:hover {
   transform: scale(1.1);
 }
+.markdown-body code,
+.markdown-body tt {
+  color: #c7254e;
+}

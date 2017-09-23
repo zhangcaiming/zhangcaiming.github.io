@@ -74,7 +74,7 @@
 <a id="more"></a>
 <h4 id="Thymeleaf-标准模板"><a href="#Thymeleaf-标准模板" class="headerlink" title="Thymeleaf 标准模板"></a>Thymeleaf 标准模板</h4><hr>
 <p><code>thymeleaf 最大的特点是通过HTML的标签属性渲染标签内容</code>，<code>thymeleaf</code>标准模板例子:</p>
-<pre><code>&lt;!DOCTYPE html SYSTEM &quot;http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd&quot;&gt;
+<pre><code class="html">&lt;!DOCTYPE html SYSTEM &quot;http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd&quot;&gt;
 
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;
       xmlns:th=&quot;http://www.thymeleaf.org&quot;&gt;
@@ -93,7 +93,8 @@
   &lt;/body&gt;
 
 &lt;/html&gt;
-</code></pre><p>这是一段标准的HTML代码，这也就意味着通过浏览器直接打开它是可以正确解析它的结构并看到页面的样子。相比去其他的模板引擎在指定的位置通过<code>${}</code>等表达式进行渲染，Thymeleaf则是一种针对HTML/XML定制的模板语言（当然它可以被扩展），它通过标签中的<code>th:text</code>属性来填充该标签的一段内容。上例中，<code>&lt;p th:text=&quot;#{home.welcome}&quot;&gt;Welcome to our grocery store!&lt;/p&gt;</code>意味着<code>&lt;p&gt;</code>标签中的内容会被表达式<code>#{home.welcome}</code>的值所替代，无论模板中它的内容是什么，之所以在模板中“多此一举“地填充它的内容，完全是为了它能够作为原型在浏览器中直接显示出来。</p>
+</code></pre>
+<p>这是一段标准的HTML代码，这也就意味着通过浏览器直接打开它是可以正确解析它的结构并看到页面的样子。相比去其他的模板引擎在指定的位置通过<code>${}</code>等表达式进行渲染，Thymeleaf则是一种针对HTML/XML定制的模板语言（当然它可以被扩展），它通过标签中的<code>th:text</code>属性来填充该标签的一段内容。上例中，<code>&lt;p th:text=&quot;#{home.welcome}&quot;&gt;Welcome to our grocery store!&lt;/p&gt;</code>意味着<code>&lt;p&gt;</code>标签中的内容会被表达式<code>#{home.welcome}</code>的值所替代，无论模板中它的内容是什么，之所以在模板中“多此一举“地填充它的内容，完全是为了它能够作为原型在浏览器中直接显示出来。</p>
 <h4 id="标准表达式语法"><a href="#标准表达式语法" class="headerlink" title="标准表达式语法"></a>标准表达式语法</h4><hr>
 <h5 id="变量"><a href="#变量" class="headerlink" title="变量"></a><strong>变量</strong></h5><p>Thymeleaf模板引擎在进行模板渲染时，还会附带一个Context存放进行模板渲染的变量，在模板中定义的表达式本质上就是从Context中获取对应的变量的值：</p>
 <pre><code class="html">&lt;p&gt;Today is: &lt;span th:text=&quot;${today}&quot;&gt;13 february 2011&lt;/span&gt;.&lt;/p&gt;
